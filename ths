@@ -69,8 +69,10 @@ def uagent_header_parse(header_value):
 
 def parse_url(url):
 	if url[-1] == "/":
-		target_url = url[:(len(url) - 1)]
-		return target_url
+		url = url[:(len(url) - 1)]
+		return url
+	else:
+		return url
 
 def link_search(webcontent):
 	links_list = re.findall(r'(?i)href=["\']?(.*?)[\s > " \']', webcontent)
@@ -104,9 +106,8 @@ def get_response(web_url, user_agent, **proxy_name):
 			print(f'''
 			{title}
 			''')
-			web_url = parse_url(web_url)
 			for link in links:
-				link_dia = f'			|---{white}{fix_http(web_url, link)}{noclr}'
+				link_dia = f'			|---{white}{fix_http(parse_url(web_url), link)}{noclr}'
 				print(link_dia)
 		else:
 			resp = requests.get(web_url,headers=headers, verify=False, allow_redirects=True)
@@ -116,9 +117,8 @@ def get_response(web_url, user_agent, **proxy_name):
 			print('''
 			{title}
 			''')
-			web_url = parse_url(web_url)
 			for link in links:
-				link_dia = f'			|---{white}{fix_http(web_url, link)}{noclr}'
+				link_dia = f'			|---{white}{fix_http(parse_url(web_url), link)}{noclr}'
 				print(link_dia)
 	except Exception as e:
 			print(f"[{bred}Error{noclr}] something went wrong !\n")
