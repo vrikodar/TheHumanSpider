@@ -94,7 +94,6 @@ def fix_http(target_url, link_pgsrc):
 
 def get_response(web_url, user_agent, **proxy_name):
 	try:
-		web_url = parse_url(web_url)
 		headers = requests.utils.default_headers()
 		headers.update({'User-Agent': f'{user_agent}'})
 		if proxy_name != None:
@@ -105,6 +104,7 @@ def get_response(web_url, user_agent, **proxy_name):
 			print(f'''
 			{title}
 			''')
+			web_url = parse_url(web_url)
 			for link in links:
 				link_dia = f'			|---{white}{fix_http(web_url, link)}{noclr}'
 				print(link_dia)
@@ -116,6 +116,7 @@ def get_response(web_url, user_agent, **proxy_name):
 			print('''
 			{title}
 			''')
+			web_url = parse_url(web_url)
 			for link in links:
 				link_dia = f'			|---{white}{fix_http(web_url, link)}{noclr}'
 				print(link_dia)
@@ -137,8 +138,6 @@ if options.websites_file_path == None and options.website_link == None:
 	sys.exit(0)
 elif options.website_link != None:
 	website_url = options.website_link
-	if website_url[-1] == "/":
-		website_url = website_url[:(len(target_url) - 1)]
 	proxy_relay = options.relay_proxy
 	print(f"\n[{bblue}INFO{noclr}] Spidering {cyan}{website_url}{noclr}")
 	user_agent_header = uagent_header_parse(options.user_agent)
@@ -151,8 +150,6 @@ elif check_file_existence(options.websites_file_path):
 	with open(file_path, 'r') as file:
 		for line in file.readlines():
 			website_url = parse_weburl(line.strip())
-				if website_url[-1] == "/":
-					website_url = website_url[:(len(target_url) - 1)]
 			print(f"\n[{bblue}INFO{noclr}] Spidering {cyan}{website_url}{noclr}")
 			get_response(website_url,user_agent_header,http=proxy_relay,https=proxy_relay)
 
