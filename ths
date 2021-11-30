@@ -137,6 +137,8 @@ if options.websites_file_path == None and options.website_link == None:
 	sys.exit(0)
 elif options.website_link != None:
 	website_url = options.website_link
+	if website_url[-1] == "/":
+		website_url = website_url[:(len(target_url) - 1)]
 	proxy_relay = options.relay_proxy
 	print(f"\n[{bblue}INFO{noclr}] Spidering {cyan}{website_url}{noclr}")
 	user_agent_header = uagent_header_parse(options.user_agent)
@@ -149,6 +151,8 @@ elif check_file_existence(options.websites_file_path):
 	with open(file_path, 'r') as file:
 		for line in file.readlines():
 			website_url = parse_weburl(line.strip())
+				if website_url[-1] == "/":
+					website_url = website_url[:(len(target_url) - 1)]
 			print(f"\n[{bblue}INFO{noclr}] Spidering {cyan}{website_url}{noclr}")
 			get_response(website_url,user_agent_header,http=proxy_relay,https=proxy_relay)
 
