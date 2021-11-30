@@ -24,7 +24,7 @@ name = '''
  |_| |_|_|\___.|_|_|`___||_|_|_|<___||_|_|<___/|  _/|_|\___|\___.|_|
                                                |_|                   '''
 
-print(f'''\n{bblue}{name}{noclr}{bred}v(1.0){noclr}
+print(f'''\n{bblue}{name}{noclr}{bred}v(1.0)-beta{noclr}
 Author: {bred}z3r0day{noclr}
 {white}Copyright (c) 2021{noclr}
 
