@@ -149,7 +149,7 @@ elif check_file_existence(options.websites_file_path):
 	print(f"\n[{bblue}INFO{noclr}] {cyan}{file_path}{noclr} file found!\n")
 	with open(file_path, 'r') as file:
 		for line in file.readlines():
-			website_url = parse_weburl(line.strip())
+			website_url = parse_url(line.strip())
 			print(f"\n[{bblue}INFO{noclr}] Spidering {cyan}{website_url}{noclr}")
 			get_response(website_url,user_agent_header,http=proxy_relay,https=proxy_relay)
 
