@@ -11,6 +11,8 @@ import pyjs
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+sys.path.insert(0, './Modules')
+
 white = "\033[1;37m"
 green = '\033[1;32;48m'
 bgreen = '\033[1;32m'
