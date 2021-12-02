@@ -5,7 +5,9 @@ import socket
 import re
 import requests
 import sys
+import time
 import os
+import pyjs
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -24,7 +26,7 @@ name = '''
  |_| |_|_|\___.|_|_|`___||_|_|_|<___||_|_|<___/|  _/|_|\___|\___.|_|
                                                |_|                   '''
 
-print(f'''\n{bblue}{name}{noclr}{bred}v(1.0)-beta{noclr}
+print(f'''\n{bblue}{name}{noclr}{bred}v(1.1)-stable{noclr}
 Author: {bred}z3r0day{noclr}
 {white}Copyright (c) 2021{noclr}
 
@@ -74,6 +76,67 @@ def parse_url(url):
 	else:
 		return url
 
+def parse_links(links_list, target_url, webcontent):
+	def parse_css(links_list):
+		css_links = []
+		for link in links_list:
+			if '.css' in fix_http(target_url, link):
+				css_links.append(link)
+				links_list.remove(link)
+		return css_links 
+	def parse_imgs(links_list):
+		imgs_list = []
+		for link in links_list:
+			if '.ico' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+			elif '.jpg' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+			elif '.svg' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+			elif '.jpeg' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+			elif '.gif' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+			elif '.png' in fix_http(target_url, link):
+				imgs_list.append(link)
+				links_list.remove(link)
+		return imgs_list
+	def parse_js(links_list, webcontent):
+		js_links = []
+		for link in links_list:
+			if '.js' in fix_http(target_url, link):
+				js_links.append(link)
+				links_list.remove(link)
+		js_from_src = pyjs.js_search(webcontent)
+		js_links += js_from_src		
+		return js_links
+	def parse_ext(links_list, web_url):
+		ext_links = []
+		domain_name = re.findall("//(.*?)/", web_url)[0]
+		for link in links_list:
+			if not domain_name in fix_http(target_url, link):
+				ext_links.append(link)
+				links_list.remove(link)
+		time.sleep(1)
+		link_print('SITE',links_list,web_url)
+		return ext_links
+	return parse_css(links_list), parse_imgs(links_list), parse_js(links_list,webcontent), parse_ext(links_list,target_url) 
+
+
+def link_print(type_link, list_links, target_url):
+	title = f"\n[{cyan}{type_link}{noclr}] {bgreen}{target_url}{noclr}"
+	print(f'''
+	{title}
+	''')
+	for link in list_links:
+		link_dia = f'			|---{white}{fix_http(parse_url(target_url), link)}{noclr}'
+		print(link_dia)
+
 def link_search(webcontent):
 	links_list = re.findall(r'(?i)href=["\']?(.*?)[\s > " \']', webcontent)
 	links_list = list(set(links_list))
@@ -95,6 +158,8 @@ def fix_http(target_url, link_pgsrc):
 		return link_pgsrc
 
 def get_response(web_url, user_agent, **proxy_name):
+	if web_url[-1] != "/":
+		web_url += "/" 
 	try:
 		headers = requests.utils.default_headers()
 		headers.update({'User-Agent': f'{user_agent}'})
@@ -102,24 +167,21 @@ def get_response(web_url, user_agent, **proxy_name):
 			print(f"[{bblue}INFO{noclr}] using {bred}proxy{noclr} {cyan}{proxy_name['http']}{noclr}")
 			resp = requests.get(web_url,headers=headers, proxies=proxy_name, verify=False, allow_redirects=True)
 			links = link_search(resp.text)
-			title = f"[{cyan}SITE{noclr}] {bgreen}{web_url}{noclr}"
-			print(f'''
-			{title}
-			''')
-			for link in links:
-				link_dia = f'			|---{white}{fix_http(parse_url(web_url), link)}{noclr}'
-				print(link_dia)
+			webcontent = resp.text
+			css_links, img_links, js_links, ext_links = parse_links(links, web_url, webcontent)
+			link_print('EXTERNAL', ext_links, web_url)
+			link_print('JS', js_links, web_url)
+			link_print('CSS', css_links, web_url)
+			link_print('IMG', img_links, web_url)
 		else:
 			resp = requests.get(web_url,headers=headers, verify=False, allow_redirects=True)
 			print(f"[{bblue}INFO{noclr}] using {bred}proxy{noclr} {cyan}{proxy_name['http']}{noclr}")
 			links = link_search(resp.text)
-			title = f"[{cyan}SITE{noclr}] {bgreen}{web_url}{noclr}"
-			print('''
-			{title}
-			''')
-			for link in links:
-				link_dia = f'			|---{white}{fix_http(parse_url(web_url), link)}{noclr}'
-				print(link_dia)
+			css_links, img_links, js_links, ext_links = parse_links(links, web_url)
+			link_print('EXTERNAL', ext_links, web_url)
+			link_print('JS', js_links, web_url)
+			link_print('CSS', css_links, web_url)
+			link_print('IMG', img_links, web_url)
 	except Exception as e:
 			print(f"[{bred}Error{noclr}] something went wrong !\n")
 			print(e)
@@ -156,4 +218,6 @@ elif check_file_existence(options.websites_file_path):
 
 else:
 	print(f"\n[{bred}Error{noclr}] something went wrong, please check your {cyan}file path{noclr}\n")
+
+
 
