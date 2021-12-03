@@ -7,11 +7,11 @@ import requests
 import sys
 import time
 import os
-import pyjs
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 sys.path.insert(0, './Modules')
+import pyjs
 
 white = "\033[1;37m"
 green = '\033[1;32;48m'
